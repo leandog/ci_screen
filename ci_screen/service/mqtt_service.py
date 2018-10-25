@@ -7,7 +7,7 @@ except:
 
 import paho.mqtt.client as mqtt
 from pydispatch import dispatcher
-import simplejson as json
+import jsonpickle
 
 
 NOW_PLAYING_SIGNAL = "NOW_PLAYING_UPDATE"
@@ -47,7 +47,7 @@ class MqttService(object):
         self._client.loop_start()
 
     def on_ci_update(self, projects):
-        self._client.publish(self.ci_topic, json.dumps(projects), retain=True)
+        self._client.publish(self._ci_topic, jsonpickle.encode(projects, unpicklable=False), retain=True)
 
     @property
     def _now_playing_topic(self):
@@ -77,8 +77,8 @@ class MqttService(object):
             self._client.publish(self._online_topic, '1', retain=True)
 
         if self._ci_topic:
-            logger.info('publishing to "{}"'.format(self.ci_topic))
-            self._client.publish(self.ci_topic, '{}', retain=True)
+            logger.info('publishing to "{}"'.format(self._ci_topic))
+            self._client.publish(self._ci_topic, '{}', retain=True)
 
         if self._now_playing_topic:
             logger.info('subscribing to "{}"'.format(self._now_playing_topic))
