@@ -41,7 +41,7 @@ class MqttService(object):
             self._client.message_callback_add(self._now_playing_topic, self._on_now_playing)
         if self._marquee_topic:
             self._client.message_callback_add(self._marquee_topic, self._on_marquee)
-        if self._jenkins_topic:
+        if self._ci_topic:
             dispatcher.connect(self.on_ci_update, signal=CI_MQTT_UPDATE_SIGNAL, sender=dispatcher.Any)
         self._client.connect_async(self._settings['host'], self._settings['port'])
         self._client.loop_start()
