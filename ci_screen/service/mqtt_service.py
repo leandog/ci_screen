@@ -7,10 +7,13 @@ except:
 
 import paho.mqtt.client as mqtt
 from pydispatch import dispatcher
+import simplejson as json
 
 
 NOW_PLAYING_SIGNAL = "NOW_PLAYING_UPDATE"
 MARQUEE_SIGNAL = "SHOW_MARQUEE"
+CI_MQTT_UPDATE_SIGNAL = "CI_MQTT_UPDATE"
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,8 +41,13 @@ class MqttService(object):
             self._client.message_callback_add(self._now_playing_topic, self._on_now_playing)
         if self._marquee_topic:
             self._client.message_callback_add(self._marquee_topic, self._on_marquee)
+        if self._jenkins_topic:
+            dispatcher.connect(self.on_ci_update, signal=CI_MQTT_UPDATE_SIGNAL, sender=dispatcher.Any)
         self._client.connect_async(self._settings['host'], self._settings['port'])
         self._client.loop_start()
+
+    def on_ci_update(self, projects):
+        self._client.publish(self.ci_topic, json.dumps(projects), retain=True)
 
     @property
     def _now_playing_topic(self):
@@ -53,6 +61,10 @@ class MqttService(object):
     def _marquee_topic(self):
         return self._settings['marquee_topic']
 
+    @property
+    def _ci_topic(self):
+        return self._settings['ci_topic']
+
     def _on_disconnect(self, client, userdata, return_code):
         logger.info('disconnected from mqtt broker: {}'.format(mqtt.error_string(return_code)))
         self._client.reconnect()
@@ -63,6 +75,10 @@ class MqttService(object):
         if self._online_topic:
             logger.info('publishing to "{}"'.format(self._online_topic))
             self._client.publish(self._online_topic, '1', retain=True)
+
+        if self._ci_topic:
+            logger.info('publishing to "{}"'.format(self.ci_topic))
+            self._client.publish(self.ci_topic, '{}', retain=True)
 
         if self._now_playing_topic:
             logger.info('subscribing to "{}"'.format(self._now_playing_topic))
@@ -116,6 +132,7 @@ class MqttService(object):
             settings['now_playing_topic'] = mqtt.get('now_playing_topic', '')
             settings['online_topic'] = mqtt.get('online_topic', '')
             settings['marquee_topic'] = mqtt.get('marquee_topic', '')
+            settings['ci_topic'] = mqtt.get('ci_topic', '{}')
 
         return settings
 
@@ -127,5 +144,6 @@ class MqttService(object):
                 'username': '',
                 'password': '',
                 'now_playing_topic': '',
-                'online_topic': '', 
-                'marquee_topic': '' }
+                'online_topic': '',
+                'marquee_topic': '',
+                'ci_topic': '' }

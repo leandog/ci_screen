@@ -13,6 +13,10 @@ from ci_screen.model.projects_model import ProjectsModel
 from ci_screen.service.ci_server_poller import CIServerPoller
 
 
+CI_UPDATE_SIGNAL = "CI_UPDATE"
+CI_MQTT_UPDATE_SIGNAL = "CI_MQTT_UPDATE"
+
+
 class StatusScreen(qt.QQuickItem):
 
     holiday_changed = qt.pyqtSignal()
@@ -34,7 +38,7 @@ class StatusScreen(qt.QQuickItem):
         super(StatusScreen, self).componentComplete()
         self.on_status_updated.connect(self.on_status_update_on_ui_thread)
 
-        dispatcher.connect(self.on_status_update, "CI_UPDATE", sender=dispatcher.Any)
+        dispatcher.connect(self.on_status_update, signal=CI_UPDATE_SIGNAL, sender=dispatcher.Any)
 
         self.poller = CIServerPoller()
         self.poller.start_polling_async()
@@ -92,6 +96,8 @@ class StatusScreen(qt.QQuickItem):
 
         self._synchronize_projects(self.projects, [p for p in new_projects if not p.is_failed()], bad_ci_servers)
         self._synchronize_projects(self.failed_projects, [p for p in new_projects if p.is_failed()], bad_ci_servers)
+
+        dispatcher.send(signal=CI_MQTT_UPDATE_SIGNAL, sender=self, projects=new_projects)
 
     def on_status_update(self, responses, errors):
         self.on_status_updated.emit(responses, errors)

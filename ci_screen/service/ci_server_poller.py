@@ -14,6 +14,9 @@ import requests
 import ci_screen.service.ci_server_loader as ci_server_loader
 
 
+CI_UPDATE_SIGNAL = "CI_UPDATE"
+
+
 logger = logging.getLogger(__name__)
 
 class CIServerPoller(object):
@@ -39,7 +42,7 @@ class CIServerPoller(object):
         self.unsubscribe_all()
         self._stop.set()
         self.polling_thread = None
-    
+
     def _poll_for_changes(self):
         while not self._stop.isSet():
 
@@ -57,7 +60,7 @@ class CIServerPoller(object):
                 if error is not None:
                     errors[name] = error
 
-            dispatcher.send(signal="CI_UPDATE", sender=self, responses=responses, errors=errors)
+            dispatcher.send(signal=CI_UPDATE_SIGNAL, sender=self, responses=responses, errors=errors)
             time.sleep(self._poll_rate)
 
     def _get_auth(self, username, token):
