@@ -1,7 +1,7 @@
 from behave import *
 import pqaut.client
 import features.support.helpers as helpers
-    
+
 
 @step(u'I see projects "(?P<projects>[^"]*)"')
 def i_see_projects(context, projects):

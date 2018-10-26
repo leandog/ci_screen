@@ -9,7 +9,7 @@ import pytz
 import tzlocal
 import dateutil.parser
 import pqaut.client
-from nose.tools import assert_true 
+from nose.tools import assert_true
 
 import features.support.config_helper as config_helper
 
@@ -63,11 +63,11 @@ def get_port():
 def rebuild_config_file(context):
     config = {
                 'general': {
-                    'poll_rate_seconds':str(context.poll_rate), 
-                    'rotation':'0', 
+                    'poll_rate_seconds':str(context.poll_rate),
+                    'rotation':'0',
                     'holiday':str(context.holiday),
                     'mqtt':str(context.mqtt_enabled)
-                },  
+                },
 
                 'ci_servers': {
                     'sections':''
@@ -78,7 +78,8 @@ def rebuild_config_file(context):
                     'port':'52129',
                     'now_playing_topic':str(context.mqtt_now_playing_topic),
                     'online_topic':str(context.mqtt_online_topic),
-                    'marquee_topic':str(context.mqtt_marquee_topic)
+                    'marquee_topic':str(context.mqtt_marquee_topic),
+                    'ci_topic':str(context.mqtt_ci_topic)
                 }
              }
 

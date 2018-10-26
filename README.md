@@ -52,12 +52,12 @@ token=1042081038133300184013931000109138
 
 ## Prerequisites
 
-QT5, sip, and PyQt5 must be installed.
+Mosquitto, QT5, sip, and PyQt5 must be installed.
 
 #### OSX Install
 
 Install QT5 using the installer from [qt.io](qt.io).
-Use homebrew to install python3, sip, and pyqt5. Alternatively you can build sip and pyqt from source.
+Use homebrew to install python3, mosquitto, sip, and pyqt5. Alternatively you can build sip and pyqt from source.
 
 #### Raspbian Install
 
@@ -69,4 +69,4 @@ Install python requirements using `pip install -r requirements.txt` and run `./m
 
 ## Running tests
 
-`pip install tox` and run `tox`. To run tests. Currently they target python 3.4 or 3.5.
+`pip install tox` and run `tox`. To run tests. Currently they target python 3.4, 3.5, 3.6 or 3.7.

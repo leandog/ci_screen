@@ -29,7 +29,7 @@ Feature: MQTT
     Then I see now playing info:
       | song       | artist          | album art                               |
       | These Days | The Black Keys  | http://lorempixel.com/500/500/abstract/ |
-    
+
   Scenario: Publishes online status when running
     Given I have MQTT enabled
     And I have a CI server with projects:
@@ -97,3 +97,14 @@ Feature: MQTT
       | topic              | message                                                           |
       | /testing/marquee   | { "image_url":"../../features/assets/2.jpg","duration":5000 } |
     Then I see "../../features/assets/2.jpg"
+
+  Scenario: Push CI data to MQTT
+    Given I have MQTT enabled
+    And I have a CI server with projects:
+      | name              | status    |
+      | My Project        | Success   |
+    And ci topic is set to "/testing/builds"
+    And the app is running
+    Then I get a message:
+      | topic             | message   |
+      | /testing/builds   | [{"_activity": "Sleeping", "_last_build_label": "12 days ago", "_last_build_status": "Success", "_last_build_time": "2014-08-27T16:06:15Z", "_name": "My Project", "ci_server": "0"}]         |

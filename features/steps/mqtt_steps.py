@@ -65,6 +65,11 @@ def online_topic_is_set_to(context, topic):
     context.mqtt_online_topic = topic
     helpers.rebuild_config_file(context)
 
+@given(u'ci topic is set to "(?P<topic>[^"]*)"')
+def ci_topic_is_set_to(context, topic):
+    context.mqtt_ci_topic = topic
+    helpers.rebuild_config_file(context)
+
 @step(u'I get a message')
 def get_a_message(context):
     row = context.table[0]
@@ -73,8 +78,9 @@ def get_a_message(context):
     mqtt = context.mqtt_service
 
     mqtt.subscribe(topic)
+
     if not eventually(lambda: mqtt.get_message(topic) == message):
-        raise Exception('Expected to get a message "{}" for topic "{}"'.format(message, topic))
+        raise Exception('Expected to get a message "{}" for topic "{}". Instead got "{}"'.format(message, topic, mqtt.get_message(topic)))
 
 @given(u'marquee topic is set to "(?P<topic>[^"]*)"')
 def marquee_topic_is_set_to(context, topic):
